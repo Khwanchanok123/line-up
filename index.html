@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Line Up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+	<style type="text/css">
+		
+	</style>
+    
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>เข้าเส้น Member</h1>
+            <p>รายชื่อสมาชิกตัวกลม ไม่มีแอบอ้าง มีแต่แอบอ้วน</p>
+            
+            <div class="search-container">
+                <input type="text" class="search-box" id="searchBox" placeholder="ค้นหาสมาชิกตามชื่อ หรือตำแหน่งงาน...">
+                <button class="clear-search" id="clearSearch">×</button>
+                <div class="search-icon">🔍</div>
+            </div>
+            
+            <div class="search-results" id="searchResults"></div>
+        </div>
+
+        <div class="member-grid">
+            <div class="member-card">
+                <img src="https://img5.pic.in.th/file/secure-sv1/494141486_122218246352240699_8367740164145142746_n.jpg" alt="ปีเตอร์ คลาร์ก" class="member-avatar">
+                <div class="member-name">Jaoliz Sensery</div>
+                <div class="member-role">ตัวแม่วงการห้าเอ็ม</div>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/elizxmtn" target="_blank" class="social-btn facebook-btn">📘 Facebook</a>
+                </div>
+            </div>
+
+            <div class="member-card">
+                <img src="https://img2.pic.in.th/pic/IMG_6485669f35cf66935522.jpeg" alt="ปีเตอร์ คลาร์ก" class="member-avatar">
+                <div class="member-name">Ińząnė Sensery</div>
+                <div class="member-role">ลูกไล่พี่ลิส</div>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/inzane.sensery" target="_blank" class="social-btn facebook-btn">📘 Facebook</a>
+                </div>
+            </div>   
+
+            <div class="member-card">
+                    <img src="https://img2.pic.in.th/pic/IMG_6486d662f6cda47a0f83.jpeg" alt="ปีเตอร์ คลาร์ก" class="member-avatar">
+                    <div class="member-name">Aufield Martinez</div>
+                    <div class="member-role">เด็กข้างไข่ No.1</div>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/profile.php?id=61565835788357" target="_blank" class="social-btn facebook-btn">📘 Facebook</a>
+                </div>
+            </div>   
+
+        </div>
+
+        <div id="noResults" class="no-results" style="display: none;">
+            <div class="no-results-icon">🔍</div>
+            <div>ไม่พบสมาชิกที่ตรงกับการค้นหา</div>
+            <div style="font-size: 1rem; margin-top: 10px; opacity: 0.7;">ลองใช้คำค้นหาอื่น หรือเคลียร์การค้นหา</div>
+        </div>
+    </div>
+
+    <script>
+        const searchBox = document.getElementById('searchBox');
+        const clearSearch = document.getElementById('clearSearch');
+        const searchResults = document.getElementById('searchResults');
+        const noResults = document.getElementById('noResults');
+        const memberCards = document.querySelectorAll('.member-card');
+        const memberGrid = document.querySelector('.member-grid');
+
+        // Function to highlight search terms
+        function highlightText(text, searchTerm) {
+            if (!searchTerm) return text;
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        // Function to remove highlights
+        function removeHighlights(element) {
+            const highlights = element.querySelectorAll('.highlight');
+            highlights.forEach(highlight => {
+                highlight.outerHTML = highlight.innerHTML;
+            });
+        }
+
+        // Search function
+        function performSearch() {
+            const searchTerm = searchBox.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            // Clear previous highlights
+            memberCards.forEach(card => {
+                removeHighlights(card);
+            });
+
+            if (searchTerm === '') {
+                // Show all cards
+                memberCards.forEach(card => {
+                    card.classList.remove('hidden');
+                    card.style.display = 'block';
+                });
+                searchResults.innerHTML = '';
+                noResults.style.display = 'none';
+                clearSearch.style.display = 'none';
+                return;
+            }
+
+            clearSearch.style.display = 'flex';
+
+            memberCards.forEach(card => {
+                const name = card.querySelector('.member-name').textContent.toLowerCase();
+                const role = card.querySelector('.member-role').textContent.toLowerCase();
+
+                const nameElement = card.querySelector('.member-name');
+                const roleElement = card.querySelector('.member-role');
+
+                if (name.includes(searchTerm) || role.includes(searchTerm)) {
+                    card.classList.remove('hidden');
+                    card.style.display = 'block';
+                    visibleCount++;
+
+                    // Highlight matching terms
+                    if (name.includes(searchTerm)) {
+                        nameElement.innerHTML = highlightText(nameElement.textContent, searchTerm);
+                    }
+                    if (role.includes(searchTerm)) {
+                        roleElement.innerHTML = highlightText(roleElement.textContent, searchTerm);
+                    }
+                } else {
+                    card.classList.add('hidden');
+                    card.style.display = 'none';
+                }
+            });
+
+            // Update search results display
+            if (visibleCount === 0) {
+                searchResults.innerHTML = '';
+                noResults.style.display = 'block';
+            } else {
+                searchResults.innerHTML = `พบ ${visibleCount} คน จากการค้นหา "${searchTerm}"`;
+                noResults.style.display = 'none';
+            }
+        }
+
+        // Clear search function
+        function clearSearchFunction() {
+            searchBox.value = '';
+            memberCards.forEach(card => {
+                card.classList.remove('hidden');
+                card.style.display = 'block';
+                removeHighlights(card);
+            });
+            searchResults.innerHTML = '';
+            noResults.style.display = 'none';
+            clearSearch.style.display = 'none';
+            searchBox.focus();
+        }
+
+        // Event listeners
+        searchBox.addEventListener('input', performSearch);
+        searchBox.addEventListener('keyup', function(e) {
+            if (e.key === 'Escape') {
+                clearSearchFunction();
+            }
+        });
+
+        clearSearch.addEventListener('click', clearSearchFunction);
+
+        // Focus search box on page load
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                searchBox.focus();
+            }, 1000);
+        });
+
+        // Keyboard shortcut (Ctrl/Cmd + K) to focus search
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                searchBox.focus();
+                searchBox.select();
+            }
+        });
+    </script>
+</body>
+</html>
